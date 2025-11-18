@@ -194,6 +194,29 @@ app.delete('/medicos/:id', async (req, res) => {
   }
 });
 
+app.get('/buscar-medicos', async (req, res) => {
+  try {
+    const { cidadeId, especialidadeId } = req.query;
+
+    // Montagem dos filtros
+    const filtros = {};
+    if (cidadeId) filtros.cidadeId = cidadeId;
+    if (especialidadeId) filtros.especialidadeId = especialidadeId;
+
+    const medicos = await Medicos.findAll({
+      where: filtros,
+      include: [
+        { model: Especialidades, as: 'especialidade' },
+        { model: Cidades, as: 'cidade' }
+      ]
+    });
+
+    res.status(200).json(medicos);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro ao buscar médicos" });
+  }
+});
 
 // =============================
 // 📌 INICIAR SERVIDOR
